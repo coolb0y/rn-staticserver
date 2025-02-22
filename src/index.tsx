@@ -12,7 +12,7 @@ import {
   mkdir,
   readDirAssets,
   unlink,
-} from '@dr.pogodin/react-native-fs';
+} from 'react-native-fs';
 
 import { Emitter, Semaphore } from '@dr.pogodin/js-utils';
 

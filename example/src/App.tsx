@@ -20,7 +20,7 @@ import {
   readFile,
   readFileAssets,
   unlink,
-} from '@dr.pogodin/react-native-fs';
+} from 'react-native-fs';
 
 import { WebView } from '@dr.pogodin/react-native-webview';
 

@@ -4,7 +4,7 @@ import {
   mkdir,
   TemporaryDirectoryPath,
   writeFile,
-} from '@dr.pogodin/react-native-fs';
+} from 'react-native-fs';
 
 /**
  * Filesystem location where the library will keep its working files (configs,

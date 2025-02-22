@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import {
   DocumentDirectoryPath,
   MainBundlePath,
-} from '@dr.pogodin/react-native-fs';
+} from 'react-native-fs';
 
 import { IS_MAC_CATALYST } from './constants';
 
