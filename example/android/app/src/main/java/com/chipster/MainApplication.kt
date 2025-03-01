@@ -1,4 +1,4 @@
-package drpogodin.reactnativestaticserver.example
+package com.chipster
 
 import android.app.Application
 import com.facebook.react.PackageList

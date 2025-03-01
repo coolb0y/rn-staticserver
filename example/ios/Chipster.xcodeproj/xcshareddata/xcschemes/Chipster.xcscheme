@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "ReactNativeStaticServerExample.app"
-               BlueprintName = "ReactNativeStaticServerExample"
-               ReferencedContainer = "container:ReactNativeStaticServerExample.xcodeproj">
+               BuildableName = "Chipster.app"
+               BlueprintName = "Chipster"
+               ReferencedContainer = "container:Chipster.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "ReactNativeStaticServerExampleTests.xctest"
-               BlueprintName = "ReactNativeStaticServerExampleTests"
-               ReferencedContainer = "container:ReactNativeStaticServerExample.xcodeproj">
+               BuildableName = "ChipsterTests.xctest"
+               BlueprintName = "ChipsterTests"
+               ReferencedContainer = "container:Chipster.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "ReactNativeStaticServerExample.app"
-            BlueprintName = "ReactNativeStaticServerExample"
-            ReferencedContainer = "container:ReactNativeStaticServerExample.xcodeproj">
+            BuildableName = "Chipster.app"
+            BlueprintName = "Chipster"
+            ReferencedContainer = "container:Chipster.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "ReactNativeStaticServerExample.app"
-            BlueprintName = "ReactNativeStaticServerExample"
-            ReferencedContainer = "container:ReactNativeStaticServerExample.xcodeproj">
+            BuildableName = "Chipster.app"
+            BlueprintName = "Chipster"
+            ReferencedContainer = "container:Chipster.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

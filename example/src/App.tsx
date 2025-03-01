@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { WebView } from '@dr.pogodin/react-native-webview';
+//import { WebView } from '@dr.pogodin/react-native-webview';
 import Server, { STATES, resolveAssetsPath } from '@dr.pogodin/react-native-static-server';
 
 export default function App() {
@@ -31,11 +31,12 @@ export default function App() {
 
   const startServer = async () => {
     const fileDir = resolveAssetsPath('webroot');
+    console.log(fileDir,'fileDir');
 
     serverRef.current = new Server({
       fileDir,
       hostname: '127.0.0.1', // Local loopback address
-      port: 3000, // Port to run the server on
+      port: 8432, // Port to run the server on
       stopInBackground: false, // Stop server when app goes to background
     });
 
@@ -68,8 +69,6 @@ export default function App() {
     }
   };
 
-  const webView = useRef<WebView>(null);
-
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -77,10 +76,6 @@ export default function App() {
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <Text style={styles.title}>React Native Static Server Example</Text>
-      <Text>
-        The &lt;WebView&gt; component below this text displays a simple "Hello" message
-        served by the HTTP server.
-      </Text>
       <Text style={styles.serverStatus}>Server Status: {serverStatus}</Text>
       <Button
         title="Start Server"
@@ -92,11 +87,7 @@ export default function App() {
         onPress={stopServer}
         disabled={serverStatus !== 'Started'}
       />
-      <View style={styles.webview}>
-        <WebView
-          source={origin ? { uri: `${origin}/hello` } : { html: '' }}
-        />
-      </View>
+      
     </SafeAreaView>
   );
 }
@@ -110,12 +101,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '600',
-  },
-  webview: {
-    borderColor: 'black',
-    borderWidth: 1,
-    flex: 1,
-    marginTop: 12,
   },
   serverStatus: {
     marginTop: 8,

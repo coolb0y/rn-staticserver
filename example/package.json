@@ -1,14 +1,14 @@
 {
-  "name": "@dr.pogodin/react-native-static-server-example",
+  "name": "chipster",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "windows:autolink": "./node_modules/.bin/rnc-cli autolink-windows --sln \"windows\\ReactNativeStaticServerExample.sln\" --proj \"windows\\ReactNativeStaticServerExample\\ReactNativeStaticServerExample.vcxproj\"",
+    "windows:autolink": "./node_modules/.bin/rnc-cli autolink-windows --sln \"windows\\chipster.sln\" --proj \"windows\\chipster\\chipster.vcxproj\"",
     "build:android": "react-native build-android --extra-params \"--no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a\"",
-    "build:ios": "react-native build-ios --scheme ReactNativeStaticServerExample --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\""
+    "build:ios": "react-native build-ios --scheme chipster --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\""
   },
   "dependencies": {
     "@dr.pogodin/js-utils": "^0.0.13",
@@ -38,8 +38,8 @@
   },
   "react-native-windows": {
     "init-windows": {
-      "name": "ReactNativeStaticServerExample",
-      "namespace": "ReactNativeStaticServerExample",
+      "name": "chipster",
+      "namespace": "chipster",
       "template": "old/uwp-cpp-app"
     }
   }
