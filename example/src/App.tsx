@@ -31,6 +31,7 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [searching, setSearching] = useState<boolean>(false); // State for search progress
   const serverRef = useRef<Server | null>(null);
+  
 
   // Function to request storage permissions (required for Android 6.0+)
   const requestStoragePermission = async () => {
@@ -122,10 +123,10 @@ export default function App() {
 
   const startServer = async () => {
     setLoading(true);
-
+  
     // Request storage permissions before accessing files
     await requestStoragePermission();
-
+  
     // Search for the "WebContent" folder
     const webContentPath = await searchWebContentFolder();
     if (!webContentPath) {
@@ -133,31 +134,46 @@ export default function App() {
       setLoading(false);
       return;
     }
-
+  
+    // Prepare the extraConfig string
+    const extraConfigs = `
+      server.modules += ("mod_simple_vhost")
+      simple-vhost.server-root = "${webContentPath}"
+      simple-vhost.default-host = "default"
+    `;
+  
     console.log('WebContent folder found at:', webContentPath);
-
-    serverRef.current = new Server({
-      fileDir: webContentPath,
-      hostname: '127.0.0.1',
-      port: 8432,
-      stopInBackground: false,
-    });
-
-    serverRef.current.addStateListener((newState, details, error) => {
-      console.log(`Server state: "${STATES[newState]}".\nDetails: "${details}".`);
-      if (error) console.error(error);
-    });
-
-    const res = await serverRef.current.start();
-    if (res) {
-      setOrigin(res);
-      setServerStatus('Started');
-      console.log('Server started at:', res);
-    } else {
+    console.log('Extra Config:', extraConfigs);
+  
+    try {
+      serverRef.current = new Server({
+        extraConfig: extraConfigs,
+        fileDir: webContentPath,
+        hostname: '127.0.0.1',
+        port: 8432,
+        stopInBackground: false,
+      });
+  
+      serverRef.current.addStateListener((newState, details, error) => {
+        console.log(`Server state: "${STATES[newState]}".\nDetails: "${details}".`);
+        if (error) console.error(error);
+      });
+  
+      const res = await serverRef.current.start();
+      if (res) {
+        setServerStatus('Started');
+        console.log('Server started at:', res);
+      } else {
+        setServerStatus('Failed to start');
+        console.error('Failed to start server');
+      }
+    } catch (error) {
+      console.error('Error starting server:', error);
+      Alert.alert('Error', 'Failed to start server. Check logs for details.');
       setServerStatus('Failed to start');
-      console.error('Failed to start server');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const stopServer = async () => {
