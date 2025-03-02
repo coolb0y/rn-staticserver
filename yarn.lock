@@ -1108,18 +1108,6 @@
     buffer "^6.0.3"
     http-status-codes "^2.3.0"
 
-"@dr.pogodin/react-native-static-server-example@file:/home/cyberboy/Desktop/react-native-static-server/example":
-  version "0.0.1"
-  resolved "file:example"
-  dependencies:
-    "@dr.pogodin/js-utils" "^0.0.13"
-    "@dr.pogodin/react-native-fs" "^2.32.0"
-    "@dr.pogodin/react-native-webview" "^13.15.5"
-    "@react-native/gradle-plugin" "^0.77.1"
-    react "^19.0.0"
-    react-native "^0.78.0"
-    react-native-windows "0.77.0"
-
 "@dr.pogodin/react-native-webview@^13.15.5":
   version "13.15.5"
   resolved "https://registry.npmjs.org/@dr.pogodin/react-native-webview/-/react-native-webview-13.15.5.tgz"
@@ -2630,6 +2618,19 @@ chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
+
+"chipster@file:/home/cyberboy/Desktop/react-native-static-server/example":
+  version "0.0.1"
+  resolved "file:example"
+  dependencies:
+    "@dr.pogodin/js-utils" "^0.0.13"
+    "@dr.pogodin/react-native-fs" "^2.32.0"
+    "@dr.pogodin/react-native-webview" "^13.15.5"
+    "@react-native/gradle-plugin" "^0.77.1"
+    react "^19.0.0"
+    react-native "^0.78.0"
+    react-native-fs "^2.20.0"
+    react-native-windows "0.77.0"
 
 chrome-launcher@^0.15.2:
   version "0.15.2"
@@ -5124,7 +5125,12 @@ react-native-fs@^2.20.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
-react-native-windows@*, react-native-windows@^0.77.0:
+react-native-permissions@^5.2.5:
+  version "5.2.5"
+  resolved "https://registry.npmjs.org/react-native-permissions/-/react-native-permissions-5.2.5.tgz"
+  integrity sha512-pECev4EuA+XAq9kduJu9V5OtqKlOokf+5lawPmkTHvr6LoOl6VLZlI2Ue4tnOu1PLc6tQaG19kQ5gbKG4gyNAw==
+
+react-native-windows@*, react-native-windows@^0.77.0, react-native-windows@>=0.70.0:
   version "0.77.2"
   resolved "https://registry.npmjs.org/react-native-windows/-/react-native-windows-0.77.2.tgz"
   integrity sha512-nbcFmaprlO3ZWeFY3EWw2bE9YPmT+I7G+E0hKhMA0zAHyHU+GmoZtF8skqMNVuf/XiqjgzbeCVUp/RO8JSoV5Q==
@@ -5228,7 +5234,7 @@ react-native-windows@0.77.0:
     ws "^6.2.3"
     yargs "^17.6.2"
 
-react-native@*, react-native@^0.77.0, react-native@0.77.0:
+react-native@*, react-native@^0.77.0, react-native@>=0.70.0, react-native@0.77.0:
   version "0.77.0"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.77.0.tgz"
   integrity sha512-oCgHLGHFIp6F5UbyHSedyUXrZg6/GPe727freGFvlT7BjPJ3K6yvvdlsp7OEXSAHz6Fe7BI2n5cpUyqmP9Zn+Q==
@@ -5326,7 +5332,7 @@ react-shallow-renderer@^16.15.0:
     object-assign "^4.1.1"
     react-is "^16.12.0 || ^17.0.0 || ^18.0.0"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^18.2.0, react@18.3.1:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^18.2.0, react@>=18.1.0, react@18.3.1:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
