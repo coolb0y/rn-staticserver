@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import RNFS from 'react-native-fs'; // For file system access
-import Server, { STATES, resolveAssetsPath } from '@dr.pogodin/react-native-static-server';
+import Server, { STATES } from '@dr.pogodin/react-native-static-server';
 
 export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -31,7 +31,6 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [searching, setSearching] = useState<boolean>(false); // State for search progress
   const serverRef = useRef<Server | null>(null);
-  
 
   // Function to request storage permissions (required for Android 6.0+)
   const requestStoragePermission = async (): Promise<boolean> => {
@@ -64,36 +63,36 @@ export default function App() {
   // Function to recursively search for the "WebContent" folder
   const findWebContentFolder = async (dir: string): Promise<string | null> => {
     console.log(`Starting search in directory: ${dir}`);
-  
+
     // Create a queue to hold directories to search
     const queue: string[] = [dir];
-  
+
     while (queue.length > 0) {
       const currentDir = queue.shift(); // Get the next directory from the queue
       if (!currentDir) continue;
-  
+
       console.log(`Searching in directory: ${currentDir}`);
-  
+
       try {
         // Skip restricted directories
         if (currentDir.includes('/Android/data') || currentDir.includes('/Android/obb')) {
           console.log(`Skipping restricted directory: ${currentDir}`);
           continue;
         }
-  
+
         // Read the contents of the current directory
         const items = await RNFS.readDir(currentDir);
         console.log(`Found ${items.length} items in ${currentDir}`);
-  
+
         for (const item of items) {
           console.log(`Checking item: ${item.name}`);
-  
+
           // If the item is the "WebContent" folder, return its path
           if (item.isDirectory() && item.name === 'WebContent') {
             console.log(`Found WebContent folder at: ${item.path}`);
             return item.path;
           }
-  
+
           // If the item is a directory, add it to the queue for further searching
           if (item.isDirectory()) {
             console.log(`Adding directory to queue: ${item.path}`);
@@ -104,7 +103,7 @@ export default function App() {
         console.error(`Error searching in ${currentDir}:`, error);
       }
     }
-  
+
     // If the loop finishes without finding the folder, return null
     console.log('WebContent folder not found');
     return null;
@@ -156,10 +155,10 @@ export default function App() {
 
   const startServer = async () => {
     setLoading(true);
-  
+
     // Request storage permissions before accessing files
     await requestStoragePermission();
-  
+
     // Search for the "WebContent" folder
     const webContentPath = await searchWebContentFolder();
     if (!webContentPath) {
@@ -167,17 +166,17 @@ export default function App() {
       setLoading(false);
       return;
     }
-  
+
     // Prepare the extraConfig string
     const extraConfigs = `
       server.modules += ("mod_simple_vhost")
       simple-vhost.server-root = "${webContentPath}"
       simple-vhost.default-host = "default"
     `;
-  
+
     console.log('WebContent folder found at:', webContentPath);
     console.log('Extra Config:', extraConfigs);
-  
+
     try {
       serverRef.current = new Server({
         extraConfig: extraConfigs,
@@ -186,12 +185,12 @@ export default function App() {
         port: 8432,
         stopInBackground: false,
       });
-  
+
       serverRef.current.addStateListener((newState, details, error) => {
         console.log(`Server state: "${STATES[newState]}".\nDetails: "${details}".`);
         if (error) console.error(error);
       });
-  
+
       const res = await serverRef.current.start();
       if (res) {
         setServerStatus('Started');
@@ -227,7 +226,9 @@ export default function App() {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <Text style={styles.title}>React Native Static Server Example</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Chipster Web Server</Text>
+      </View>
       <Text style={styles.serverStatus}>Server Status: {serverStatus}</Text>
 
       {searching ? (
@@ -256,15 +257,22 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    alignItems: 'center', // Center horizontally
+    justifyContent: 'center', // Center vertically
+    marginBottom: 16, // Add some spacing below the title
+  },
   title: {
     fontSize: 24,
     fontWeight: '600',
+    textAlign: 'center', // Center text horizontally
   },
   serverStatus: {
     marginTop: 8,
     fontSize: 18,
     fontWeight: 'bold',
     color: 'green',
+    textAlign: 'center', // Center text horizontally
   },
   loadingContainer: {
     alignItems: 'center',
@@ -274,5 +282,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 16,
     color: '#000',
+    textAlign: 'center', // Center text horizontally
   },
 });
