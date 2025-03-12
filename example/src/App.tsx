@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Button,
+  Image,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
@@ -60,8 +61,11 @@ export default function App() {
     return true; // Permissions are not required on iOS
   };
 
+  const createVirtualDirectoryPath = (dir: string, subDir: string): string => {
+    return dir.replace(/ChipsterContent$/, "ChipsterEngine") + `/${subDir}`;
+  };
   // Function to recursively search for the "WebContent" folder
-  const findWebContentFolder = async (dir: string): Promise<string | null> => {
+  const findChipsterContentFolder = async (dir: string): Promise<string | null> => {
     console.log(`Starting search in directory: ${dir}`);
 
     // Create a queue to hold directories to search
@@ -116,19 +120,19 @@ export default function App() {
     // Priority 1: Download directory
     const downloadDir = RNFS.DownloadDirectoryPath;
     console.log('Searching in Download directory:', downloadDir);
-    let webContentPath = await findWebContentFolder(downloadDir);
-    if (webContentPath) {
+    let chipsterContentPath = await findChipsterContentFolder(downloadDir);
+    if (chipsterContentPath) {
       setSearching(false);
-      return webContentPath;
+      return chipsterContentPath;
     }
 
     // Priority 2: Root of internal storage
     const internalStorageRoot = RNFS.ExternalStorageDirectoryPath;
     console.log('Searching in internal storage root:', internalStorageRoot);
-    webContentPath = await findWebContentFolder(internalStorageRoot);
-    if (webContentPath) {
+    chipsterContentPath = await findChipsterContentFolder(internalStorageRoot);
+    if (chipsterContentPath) {
       setSearching(false);
-      return webContentPath;
+      return chipsterContentPath;
     }
 
     // Priority 3: Root of SD card (if available)
@@ -138,10 +142,10 @@ export default function App() {
         const sdCardExists = await RNFS.exists(sdCardRoot);
         if (sdCardExists) {
           console.log('Searching in SD card root:', sdCardRoot);
-          webContentPath = await findWebContentFolder(sdCardRoot);
-          if (webContentPath) {
+          chipsterContentPath = await findChipsterContentFolder(sdCardRoot);
+          if (chipsterContentPath) {
             setSearching(false);
-            return webContentPath;
+            return chipsterContentPath;
           }
         }
       } catch (error) {
@@ -160,27 +164,48 @@ export default function App() {
     await requestStoragePermission();
 
     // Search for the "WebContent" folder
-    const webContentPath = await searchWebContentFolder();
-    if (!webContentPath) {
+    const chipsterContentPath = await searchWebContentFolder();
+    if (!chipsterContentPath) {
       Alert.alert('Error', 'WebContent folder not found');
       setLoading(false);
       return;
     }
+    
+    const chipsterSearchPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSearch");
+    const chipsterWebMakerPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterWebMaker");
+    const chipsterSupportPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSupport");
 
-    // Prepare the extraConfig string
+
+
     const extraConfigs = `
-      server.modules += ("mod_simple_vhost")
-      simple-vhost.server-root = "${webContentPath}"
-      simple-vhost.default-host = "default"
-    `;
-
-    console.log('WebContent folder found at:', webContentPath);
-    console.log('Extra Config:', extraConfigs);
+    server.modules += ("mod_simple_vhost")
+    simple-vhost.server-root = "${chipsterContentPath}/WebContent"
+    simple-vhost.default-host = "default"
+  
+    # Virtual host for ChipsterSearch
+    $HTTP["host"] == "chipstersearch" {
+        server.document-root = "${chipsterSearchPath}"
+    }
+  
+    # Virtual host for ChipsterWebMaker
+    $HTTP["host"] == "chipsterwebmaker" {
+        server.document-root = "${chipsterWebMakerPath}"
+    }
+  
+    # Virtual host for ChipsterSupport
+    $HTTP["host"] == "chipstersupport" {
+        server.document-root = "${chipsterSupportPath}"
+    }
+  `;
+  
+  console.log('ChipsterContent folder found at:', chipsterContentPath);
+  console.log('Extra Config:', extraConfigs);
+  
 
     try {
       serverRef.current = new Server({
         extraConfig: extraConfigs,
-        fileDir: webContentPath,
+        fileDir: chipsterContentPath,
         hostname: '127.0.0.1',
         port: 8432,
         stopInBackground: false,
@@ -226,6 +251,9 @@ export default function App() {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
+      <View>
+      
+      </View>
       <View style={styles.header}>
         <Text style={styles.title}>Chipster Web Server</Text>
       </View>

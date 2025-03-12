@@ -1,9 +1,0 @@
-.header {
-  background: linear-gradient(to right, red, orange, yellow, green, skyblue, blue, purple);
-  background-clip: text;
-  color: transparent;
-  display: inline-block;
-  font-weight: 900;
-  text-decoration: underline red;
-  -webkit-background-clip: text;
-}
