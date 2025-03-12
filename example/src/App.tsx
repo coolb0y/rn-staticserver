@@ -34,47 +34,80 @@ export default function App() {
   
 
   // Function to request storage permissions (required for Android 6.0+)
-  const requestStoragePermission = async () => {
+  const requestStoragePermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android') {
       try {
-        const granted = await PermissionsAndroid.request(
+        const granted = await PermissionsAndroid.requestMultiple([
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: 'Storage Permission',
-            message: 'App needs access to your storage to read files.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Storage permission granted');
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        ]);
+        if (
+          granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
+            PermissionsAndroid.RESULTS.GRANTED &&
+          granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
+            PermissionsAndroid.RESULTS.GRANTED
+        ) {
+          console.log('Storage permissions granted');
+          return true;
         } else {
-          console.log('Storage permission denied');
+          console.log('Storage permissions denied');
+          return false;
         }
       } catch (err) {
         console.warn(err);
+        return false;
       }
     }
+    return true; // Permissions are not required on iOS
   };
 
   // Function to recursively search for the "WebContent" folder
   const findWebContentFolder = async (dir: string): Promise<string | null> => {
-    try {
-      const items = await RNFS.readDir(dir);
-      for (const item of items) {
-        if (item.isDirectory() && item.name === 'WebContent') {
-          return item.path; // Found the folder
+    console.log(`Starting search in directory: ${dir}`);
+  
+    // Create a queue to hold directories to search
+    const queue: string[] = [dir];
+  
+    while (queue.length > 0) {
+      const currentDir = queue.shift(); // Get the next directory from the queue
+      if (!currentDir) continue;
+  
+      console.log(`Searching in directory: ${currentDir}`);
+  
+      try {
+        // Skip restricted directories
+        if (currentDir.includes('/Android/data') || currentDir.includes('/Android/obb')) {
+          console.log(`Skipping restricted directory: ${currentDir}`);
+          continue;
         }
-        if (item.isDirectory()) {
-          const found = await findWebContentFolder(item.path); // Recursively search
-          if (found) return found;
+  
+        // Read the contents of the current directory
+        const items = await RNFS.readDir(currentDir);
+        console.log(`Found ${items.length} items in ${currentDir}`);
+  
+        for (const item of items) {
+          console.log(`Checking item: ${item.name}`);
+  
+          // If the item is the "WebContent" folder, return its path
+          if (item.isDirectory() && item.name === 'WebContent') {
+            console.log(`Found WebContent folder at: ${item.path}`);
+            return item.path;
+          }
+  
+          // If the item is a directory, add it to the queue for further searching
+          if (item.isDirectory()) {
+            console.log(`Adding directory to queue: ${item.path}`);
+            queue.push(item.path);
+          }
         }
+      } catch (error) {
+        console.error(`Error searching in ${currentDir}:`, error);
       }
-    } catch (error) {
-      console.error(`Error searching in ${dir}:`, error);
     }
-    return null; // Not found
+  
+    // If the loop finishes without finding the folder, return null
+    console.log('WebContent folder not found');
+    return null;
   };
 
   // Function to search for "WebContent" in prioritized locations
