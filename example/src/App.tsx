@@ -64,7 +64,7 @@ export default function App() {
   const createVirtualDirectoryPath = (dir: string, subDir: string): string => {
     return dir.replace(/ChipsterContent$/, "ChipsterEngine") + `/${subDir}`;
   };
-  // Function to recursively search for the "WebContent" folder
+  // Function to recursively search for the "ChipsterContent" folder
   const findChipsterContentFolder = async (dir: string): Promise<string | null> => {
     console.log(`Starting search in directory: ${dir}`);
 
@@ -91,9 +91,9 @@ export default function App() {
         for (const item of items) {
           console.log(`Checking item: ${item.name}`);
 
-          // If the item is the "WebContent" folder, return its path
-          if (item.isDirectory() && item.name === 'WebContent') {
-            console.log(`Found WebContent folder at: ${item.path}`);
+          // If the item is the "ChipsterContent" folder, return its path
+          if (item.isDirectory() && item.name === 'ChipsterContent') {
+            console.log(`Found ChipsterContent folder at: ${item.path}`);
             return item.path;
           }
 
@@ -109,12 +109,12 @@ export default function App() {
     }
 
     // If the loop finishes without finding the folder, return null
-    console.log('WebContent folder not found');
+    console.log('ChipsterContent folder not found');
     return null;
   };
 
-  // Function to search for "WebContent" in prioritized locations
-  const searchWebContentFolder = async (): Promise<string | null> => {
+  // Function to search for "ChipsterContent" in prioritized locations
+  const searchChipsterContentFolder = async (): Promise<string | null> => {
     setSearching(true);
 
     // Priority 1: Download directory
@@ -163,10 +163,10 @@ export default function App() {
     // Request storage permissions before accessing files
     await requestStoragePermission();
 
-    // Search for the "WebContent" folder
-    const chipsterContentPath = await searchWebContentFolder();
+    // Search for the "ChipsterContent" folder
+    const chipsterContentPath = await searchChipsterContentFolder();
     if (!chipsterContentPath) {
-      Alert.alert('Error', 'WebContent folder not found');
+      Alert.alert('Error', 'ChipsterContent folder not found');
       setLoading(false);
       return;
     }
@@ -174,7 +174,6 @@ export default function App() {
     const chipsterSearchPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSearch");
     const chipsterWebMakerPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterWebMaker");
     const chipsterSupportPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSupport");
-
 
 
     const extraConfigs = `
@@ -262,7 +261,7 @@ export default function App() {
       {searching ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
-          <Text style={styles.loadingText}>Searching for WebContent folder...</Text>
+          <Text style={styles.loadingText}>Searching for ChipsterContent folder...</Text>
         </View>
       ) : loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
