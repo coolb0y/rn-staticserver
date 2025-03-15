@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Alert,
   Button,
-  Linking,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
@@ -41,7 +40,7 @@ export default function App() {
       "acr.browser.lightning.data": "must be a string",
     })
   .then(wasOpened => console.log("Opened Termux:", wasOpened))
-  .catch(err => console.error("Failed to open Termux:", err));
+  .catch(()=> Alert.alert("Failed to Open Lighning Browser","Please open lightning browser manually"));
   };
 
   const requestStoragePermission = async (): Promise<boolean> => {
@@ -228,6 +227,7 @@ export default function App() {
       const res = await serverRef.current.start();
       if (res) {
         setServerStatus('Started');
+        launchBrowser();
         console.log('Server started at:', res);
       } else {
         setServerStatus('Failed to start');
@@ -260,13 +260,6 @@ export default function App() {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-
-      <View>
-      <TouchableOpacity onPress={launchBrowser} style={{ padding: 10, backgroundColor: 'blue' }}>
-      <Text style={{ color: 'white' }}>Open in Lightning Browser</Text>
-    </TouchableOpacity>
-      </View>
-
       <View style={styles.header}>
         <Text style={styles.title}>Chipster Web Server</Text>
       </View>
