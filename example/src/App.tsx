@@ -3,19 +3,21 @@ import {
   ActivityIndicator,
   Alert,
   Button,
-  Image,
+  Linking,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import RNFS from 'react-native-fs'; // For file system access
 import Server, { STATES } from '@dr.pogodin/react-native-static-server';
+import SendIntentAndroid from 'react-native-send-intent';
 
 export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -32,8 +34,16 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [searching, setSearching] = useState<boolean>(false); // State for search progress
   const serverRef = useRef<Server | null>(null);
+  
+  const launchBrowser = () => {
+    SendIntentAndroid.openApp("acr.browser.lightning",{
+      "acr.browser.lightning.reason": "just because",
+      "acr.browser.lightning.data": "must be a string",
+    })
+  .then(wasOpened => console.log("Opened Termux:", wasOpened))
+  .catch(err => console.error("Failed to open Termux:", err));
+  };
 
-  // Function to request storage permissions (required for Android 6.0+)
   const requestStoragePermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android') {
       try {
@@ -250,9 +260,13 @@ export default function App() {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
+
       <View>
-      
+      <TouchableOpacity onPress={launchBrowser} style={{ padding: 10, backgroundColor: 'blue' }}>
+      <Text style={{ color: 'white' }}>Open in Lightning Browser</Text>
+    </TouchableOpacity>
       </View>
+
       <View style={styles.header}>
         <Text style={styles.title}>Chipster Web Server</Text>
       </View>
