@@ -9,7 +9,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
@@ -35,9 +34,9 @@ export default function App() {
   const serverRef = useRef<Server | null>(null);
   
   const launchBrowser = () => {
-    SendIntentAndroid.openApp("acr.browser.lightning",{
-      "acr.browser.lightning.reason": "just because",
-      "acr.browser.lightning.data": "must be a string",
+    SendIntentAndroid.openApp("com.cookiegames.smartcookie",{
+      "com.cookiegames.smartcookie.reason": "just because",
+      "com.cookiegames.smartcookie.data": "must be a string",
     })
   .then(wasOpened => console.log("Opened Termux:", wasOpened))
   .catch(()=> Alert.alert("Failed to Open Lighning Browser","Please open lightning browser manually"));
