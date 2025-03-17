@@ -34,9 +34,9 @@ export default function App() {
   const serverRef = useRef<Server | null>(null);
   
   const launchBrowser = () => {
-    SendIntentAndroid.openApp("com.cookiegames.smartcookie",{
-      "com.cookiegames.smartcookie.reason": "just because",
-      "com.cookiegames.smartcookie.data": "must be a string",
+    SendIntentAndroid.openApp("net.slions.fulguris.full.fdroid",{
+      "net.slions.fulguris.full.fdroid.reason": "just because",
+      "net.slions.fulguris.full.fdroid.data": "must be a string",
     })
   .then(wasOpened => console.log("Opened Termux:", wasOpened))
   .catch(()=> Alert.alert("Failed to Open Lighning Browser","Please open lightning browser manually"));
