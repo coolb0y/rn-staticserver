@@ -185,10 +185,16 @@ export default function App() {
 
 
     const extraConfigs = `
-    server.modules += ("mod_simple_vhost")
+    server.modules += ("mod_simple_vhost", "mod_indexfile")
     simple-vhost.server-root = "${chipsterContentPath}/WebContent"
     simple-vhost.default-host = "default"
-  
+
+    #index-file.names = ( "index.html")
+    server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
+
+
+
+
     # Virtual host for ChipsterSearch
     $HTTP["host"] == "chipstersearch" {
         server.document-root = "${chipsterSearchPath}"
