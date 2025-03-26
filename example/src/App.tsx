@@ -72,6 +72,29 @@ export default function App() {
   const createVirtualDirectoryPath = (dir: string, subDir: string): string => {
     return dir.replace(/ChipsterContent$/, "ChipsterEngine") + `/${subDir}`;
   };
+
+  // const listFolders = async (directoryPath: string): Promise<string> => {
+  //   try {
+  //       const items = await RNFS.readDir(directoryPath); // Read the directory
+  //       const onlyFolders = items
+  //           .filter(item => item.isDirectory())
+  //           .map(folder => folder.name);
+
+  //       // Add default folders
+  //       const defaultFolders = ["chipstersupport", "chipsterwebmaker", "chipstersearch"];
+  //       const allFolders = [...new Set([...defaultFolders, ...onlyFolders])]; // Ensure uniqueness
+
+  //       // Escape dots and other regex special characters for Lighttpd
+  //       const escapedFolders = allFolders.map(folder => folder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+  //       return escapedFolders.join("|"); // Convert array to a string
+  //   } catch (error) {
+  //       console.error("Error reading directory:", error);
+  //       return ""; // Return an empty string in case of an error
+  //   }
+  // };
+
+
   // Function to recursively search for the "ChipsterContent" folder
   const findChipsterContentFolder = async (dir: string): Promise<string | null> => {
     console.log(`Starting search in directory: ${dir}`);
@@ -191,9 +214,6 @@ export default function App() {
 
     #index-file.names = ( "index.html")
     server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
-
-
-
 
     # Virtual host for ChipsterSearch
     $HTTP["host"] == "chipstersearch" {
