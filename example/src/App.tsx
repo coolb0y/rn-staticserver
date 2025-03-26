@@ -73,26 +73,26 @@ export default function App() {
     return dir.replace(/ChipsterContent$/, "ChipsterEngine") + `/${subDir}`;
   };
 
-  // const listFolders = async (directoryPath: string): Promise<string> => {
-  //   try {
-  //       const items = await RNFS.readDir(directoryPath); // Read the directory
-  //       const onlyFolders = items
-  //           .filter(item => item.isDirectory())
-  //           .map(folder => folder.name);
+  const listFolders = async (directoryPath: string): Promise<string> => {
+    try {
+        const items = await RNFS.readDir(directoryPath); // Read the directory
+        const onlyFolders = items
+            .filter(item => item.isDirectory())
+            .map(folder => folder.name);
 
-  //       // Add default folders
-  //       const defaultFolders = ["chipstersupport", "chipsterwebmaker", "chipstersearch"];
-  //       const allFolders = [...new Set([...defaultFolders, ...onlyFolders])]; // Ensure uniqueness
+        // Add default folders
+        const defaultFolders = ["chipstersupport", "chipsterwebmaker", "chipstersearch"];
+        const allFolders = [...new Set([...defaultFolders, ...onlyFolders])]; // Ensure uniqueness
 
-  //       // Escape dots and other regex special characters for Lighttpd
-  //       const escapedFolders = allFolders.map(folder => folder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        // Escape dots and other regex special characters for Lighttpd
+        const escapedFolders = allFolders.map(folder => folder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
-  //       return escapedFolders.join("|"); // Convert array to a string
-  //   } catch (error) {
-  //       console.error("Error reading directory:", error);
-  //       return ""; // Return an empty string in case of an error
-  //   }
-  // };
+        return escapedFolders.join("|"); // Convert array to a string
+    } catch (error) {
+        console.error("Error reading directory:", error);
+        return ""; // Return an empty string in case of an error
+    }
+  };
 
 
   // Function to recursively search for the "ChipsterContent" folder
@@ -205,7 +205,9 @@ export default function App() {
     const chipsterSearchPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSearch");
     const chipsterWebMakerPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterWebMaker");
     const chipsterSupportPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSupport");
-
+    const errorpage = createVirtualDirectoryPath(chipsterContentPath,"ChipsterSupport/ErrorPages");
+    console.log(errorpage,'error page');
+    let folderListString = await listFolders(`${chipsterContentPath}/WebContent`);
 
     const extraConfigs = `
     server.modules += ("mod_simple_vhost", "mod_indexfile")
@@ -228,6 +230,10 @@ export default function App() {
     # Virtual host for ChipsterSupport
     $HTTP["host"] == "chipstersupport" {
         server.document-root = "${chipsterSupportPath}"
+    }
+
+    $HTTP["host"] !~ "^(${folderListString})?$" {
+    server.document-root = "${errorpage}"
     }
   `;
   
