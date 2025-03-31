@@ -39,64 +39,56 @@ export default function App() {
       "net.slions.fulguris.full.fdroid.reason": "just because",
       "net.slions.fulguris.full.fdroid.data": "must be a string",
     })
-  .then(wasOpened => console.log("Opened Termux:", wasOpened))
+  .then(wasOpened => console.log("Opened:", wasOpened))
   .catch(()=> Alert.alert("Failed to Open Lighning Browser","Please open lightning browser manually"));
   };
 
-  const requestPermission = async () => {
-
+  const requestPermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android' && Platform.Version >= 30) {
-      checkManagePermission().then((isManagePermitted) => {
-        if(isManagePermitted){
-          return true;
-        }
-      });
-      
-      requestManagePermission().then((isManagePermitted) => {
-        if(isManagePermitted){
-          return true;
-        }
-        else{
-          Alert.alert(
-            'Permission Required',
-            'Please grant Manage External Storage permission in settings.'
-        );
+      try {
+        // First check if we already have permission
+        const hasPermission = await checkManagePermission();
+        console.log("haspermission",hasPermission);
+        if (hasPermission) return true;
+        
+        // If not, request it
+        const granted = await requestManagePermission();
+        console.log("granted",granted);
+        if (granted) return true;
+        
+        Alert.alert('Permission Required', 'Please grant Manage External Storage permission in settings.');
         return false;
-        }
-      });
+      } catch (error) {
+        console.error('Permission error:', error);
+        return false;
+      }
     }
-};
+    return true; // For non-Android or older versions
+  };
 
   const requestStoragePermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android') {
-        try {
-           if (Platform.Version >= 30) {  
-            await requestPermission();   
-         
-            } else {
-                const granted = await PermissionsAndroid.requestMultiple([
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                ]);
-                if (
-                    granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
-                        PermissionsAndroid.RESULTS.GRANTED &&
-                    granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
-                        PermissionsAndroid.RESULTS.GRANTED
-                ) {
-                    console.log('Storage permissions granted');
-                    return true;
-                } else {
-                    console.log('Storage permissions denied');
-                    return false;
-                }
-            }
-        } catch (err) {
-            console.warn('Permission error:', err);
-            return false;
+      try {
+        if (Platform.Version >= 30) {  
+          return await requestPermission(); // Now properly awaited
+        } else {
+          const granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          ]);
+          return (
+            granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
+              PermissionsAndroid.RESULTS.GRANTED &&
+            granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
+              PermissionsAndroid.RESULTS.GRANTED
+          );
         }
+      } catch (err) {
+        console.warn('Permission error:', err);
+        return false;
+      }
     }
-    return true; // iOS doesn't need storage permissions
+    return true;
   };
 
 
