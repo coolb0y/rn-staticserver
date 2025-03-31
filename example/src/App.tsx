@@ -10,12 +10,13 @@ import {
   StyleSheet,
   Text,
   useColorScheme,
-  View,
+  View
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import RNFS from 'react-native-fs'; // For file system access
 import Server, { STATES } from '@dr.pogodin/react-native-static-server';
 import SendIntentAndroid from 'react-native-send-intent';
+import { requestManagePermission , checkManagePermission} from 'manage-external-storage';
 
 export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -32,7 +33,7 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [searching, setSearching] = useState<boolean>(false); // State for search progress
   const serverRef = useRef<Server | null>(null);
-  
+
   const launchBrowser = () => {
     SendIntentAndroid.openApp("net.slions.fulguris.full.fdroid",{
       "net.slions.fulguris.full.fdroid.reason": "just because",
@@ -42,32 +43,62 @@ export default function App() {
   .catch(()=> Alert.alert("Failed to Open Lighning Browser","Please open lightning browser manually"));
   };
 
+  const requestPermission = async () => {
+
+    if (Platform.OS === 'android' && Platform.Version >= 30) {
+      checkManagePermission().then((isManagePermitted) => {
+        if(isManagePermitted){
+          return true;
+        }
+      });
+      
+      requestManagePermission().then((isManagePermitted) => {
+        if(isManagePermitted){
+          return true;
+        }
+        else{
+          Alert.alert(
+            'Permission Required',
+            'Please grant Manage External Storage permission in settings.'
+        );
+        return false;
+        }
+      });
+    }
+};
+
   const requestStoragePermission = async (): Promise<boolean> => {
     if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.requestMultiple([
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        ]);
-        if (
-          granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
-            PermissionsAndroid.RESULTS.GRANTED &&
-          granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
-            PermissionsAndroid.RESULTS.GRANTED
-        ) {
-          console.log('Storage permissions granted');
-          return true;
-        } else {
-          console.log('Storage permissions denied');
-          return false;
+        try {
+           if (Platform.Version >= 30) {  
+            requestPermission();   
+         
+            } else {
+                const granted = await PermissionsAndroid.requestMultiple([
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                ]);
+                if (
+                    granted[PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE] ===
+                        PermissionsAndroid.RESULTS.GRANTED &&
+                    granted[PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE] ===
+                        PermissionsAndroid.RESULTS.GRANTED
+                ) {
+                    console.log('Storage permissions granted');
+                    return true;
+                } else {
+                    console.log('Storage permissions denied');
+                    return false;
+                }
+            }
+        } catch (err) {
+            console.warn('Permission error:', err);
+            return false;
         }
-      } catch (err) {
-        console.warn(err);
-        return false;
-      }
     }
-    return true; // Permissions are not required on iOS
+    return true; // iOS doesn't need storage permissions
   };
+
 
   const createVirtualDirectoryPath = (dir: string, subDir: string): string => {
     return dir.replace(/ChipsterContent$/, "ChipsterEngine") + `/${subDir}`;
