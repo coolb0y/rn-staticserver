@@ -71,7 +71,7 @@ export default function App() {
     if (Platform.OS === 'android') {
         try {
            if (Platform.Version >= 30) {  
-            requestPermission();   
+            await requestPermission();   
          
             } else {
                 const granted = await PermissionsAndroid.requestMultiple([
