@@ -269,7 +269,7 @@ export default function App() {
         extraConfig: extraConfigs,
         fileDir: chipsterContentPath,
         hostname: '127.0.0.1',
-        port: 8080,
+        port: 20286,
         stopInBackground: false,
       });
 
