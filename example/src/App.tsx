@@ -104,7 +104,7 @@ export default function App() {
             .map(folder => folder.name);
 
         // Add default folders
-        const defaultFolders = ["chipstersupport", "chipsterwebmaker", "chipstersearch"];
+        const defaultFolders = ["chipstersupport", "chipsterwebmaker","chipsterwp"];
         const allFolders = [...new Set([...defaultFolders, ...onlyFolders])]; // Ensure uniqueness
 
         // Escape dots and other regex special characters for Lighttpd
@@ -225,12 +225,18 @@ export default function App() {
       return;
     }
     
-    const chipsterSearchPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSearch");
-    const chipsterWebMakerPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterWebMaker");
-    const chipsterSupportPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSupport");
-    const errorpage = createVirtualDirectoryPath(chipsterContentPath,"ChipsterSupport/ErrorPages");
-    console.log(errorpage,'error page');
+    //const chipsterWebMakerPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterWebMaker");
+    // const chipsterSupportPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSupport");
+    // const errorpage = createVirtualDirectoryPath(chipsterContentPath,"ChipsterSupport/ErrorPages");
+    const chipsterWebMakerPath = `${chipsterContentPath}/EngineContent/ChipsterWebMaker`;
+    const chipsterSupportPath = `${chipsterContentPath}/EngineContent/ChipsterSupport`;
+    const chipsterwpPath = `${chipsterContentPath}/EngineContent/ChipsterWP`;
+    const errorpage = `${chipsterContentPath}/EngineContent/ChipsterSupport/ErrorPages`; 
     let folderListString = await listFolders(`${chipsterContentPath}/WebContent`);
+
+    console.log("errorpage",errorpage);
+    console.log("chipsterwpPath",chipsterwpPath);
+    console.log("chipsterSupport",chipsterSupportPath);
 
     const extraConfigs = `
     server.modules += ("mod_simple_vhost", "mod_indexfile")
@@ -239,11 +245,6 @@ export default function App() {
 
     #index-file.names = ( "index.html")
     server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
-
-    # Virtual host for ChipsterSearch
-    $HTTP["host"] == "chipstersearch" {
-        server.document-root = "${chipsterSearchPath}"
-    }
   
     # Virtual host for ChipsterWebMaker
     $HTTP["host"] == "chipsterwebmaker" {
@@ -255,6 +256,10 @@ export default function App() {
         server.document-root = "${chipsterSupportPath}"
     }
 
+    $HTTP["host"] == "chipsterwp" {
+        server.document-root = "${chipsterwpPath}"
+    }
+
     $HTTP["host"] !~ "^(${folderListString})?$" {
     server.document-root = "${errorpage}"
     }
@@ -263,7 +268,6 @@ export default function App() {
   console.log('ChipsterContent folder found at:', chipsterContentPath);
   console.log('Extra Config:', extraConfigs);
   
-
     try {
       serverRef.current = new Server({
         extraConfig: extraConfigs,
