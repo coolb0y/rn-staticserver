@@ -17,6 +17,8 @@ import RNFS from 'react-native-fs'; // For file system access
 import Server, { STATES } from '@dr.pogodin/react-native-static-server';
 import SendIntentAndroid from 'react-native-send-intent';
 import { requestManagePermission , checkManagePermission} from 'manage-external-storage';
+import { NativeModules } from 'react-native';
+const PhpServer = NativeModules.PhpServer;
 
 export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -214,6 +216,9 @@ export default function App() {
   const startServer = async () => {
     setLoading(true);
 
+    PhpServer.startPhpServer()
+    .then((msg: string) => console.log(msg))
+    .catch((err: any) => console.error(err));
     // Request storage permissions before accessing files
     await requestStoragePermission();
 
@@ -239,31 +244,45 @@ export default function App() {
     console.log("chipsterSupport",chipsterSupportPath);
 
     const extraConfigs = `
-    server.modules += ("mod_simple_vhost", "mod_indexfile")
+    server.modules += ("mod_simple_vhost", "mod_indexfile", "mod_fastcgi")
+    
     simple-vhost.server-root = "${chipsterContentPath}/WebContent"
     simple-vhost.default-host = "default"
-
-    #index-file.names = ( "index.html")
-    server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
-  
+    
+    server.indexfiles = (
+      "index.html", "default.html", "index.htm", "default.htm",
+      "index.php3", "index.php", "index.shtml", "index.html.var",
+      "index.lua", "index.pl", "index.cgi"
+    )
+    
     # Virtual host for ChipsterWebMaker
     $HTTP["host"] == "chipsterwebmaker" {
-        server.document-root = "${chipsterWebMakerPath}"
+      server.document-root = "${chipsterWebMakerPath}"
     }
-  
+    
     # Virtual host for ChipsterSupport
     $HTTP["host"] == "chipstersupport" {
-        server.document-root = "${chipsterSupportPath}"
+      server.document-root = "${chipsterSupportPath}"
     }
-
+    
+    # Virtual host for ChipsterWP
     $HTTP["host"] == "chipsterwp" {
-        server.document-root = "${chipsterwpPath}"
+      server.document-root = "${chipsterwpPath}"
     }
-
+    
+    # Fallback error page if host doesn't match known folders
     $HTTP["host"] !~ "^(${folderListString})?$" {
-    server.document-root = "${errorpage}"
+      server.document-root = "${errorpage}"
     }
-  `;
+    
+    fastcgi.server = (
+      ".php" => (
+        "localhost" => (
+          "socket" => "/data/data/com.chipster/tmp/php.socket",
+          "broken-scriptfilename" => "enable"
+        )
+      )
+    )`
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
   console.log('Extra Config:', extraConfigs);
@@ -303,7 +322,12 @@ export default function App() {
   const stopServer = async () => {
     if (serverRef.current) {
       setLoading(true);
-      await serverRef.current.stop();
+
+      PhpServer.stopPhpServer()
+      .then((msg: string) => console.log(msg))
+      .catch((err: any) => console.error(err));
+      
+    await serverRef.current.stop();
       serverRef.current = null;
       setOrigin('');
       setServerStatus('Stopped');
