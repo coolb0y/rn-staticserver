@@ -269,8 +269,17 @@ export default function App() {
     $HTTP["host"] !~ "^(${folderListString})?$" {
       server.document-root = "${errorpage}"
     }
-      
-    `
+
+  fastcgi.server = (".php" => 
+  ((
+    "socket" => "/data/user/0/com.chipster/files/php-fcgi.sock",
+    "bin-path" => "/data/user/0/com.chipster/files/php-cgi",
+    "bin-environment" => (
+      "PHP_FCGI_CHILDREN" => "1",
+      "PHP_FCGI_MAX_REQUESTS" => "100"
+    )
+  ))
+  )`
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
   console.log('Extra Config:', extraConfigs);

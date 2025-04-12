@@ -24,16 +24,16 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
         Log.d("PHP-CGI", "Exists: ${phpBinary.exists()}")
         Log.d("PHP-CGI", "Executable: ${phpBinary.canExecute()}")
 
-        val command = listOf(
-            phpBinary.absolutePath,
-            "-b", "127.0.0.1:9123"
-        )
+        // val command = listOf(
+        //     phpBinary.absolutePath,
+        //     "-b", "127.0.0.1:9123"
+        // )
 
-        val processBuilder = ProcessBuilder(command)
-            .directory(context.filesDir)
-            .redirectErrorStream(true)
+        // val processBuilder = ProcessBuilder(command)
+        //     .directory(context.filesDir)
+        //     .redirectErrorStream(true)
 
-        phpProcess = processBuilder.start()
+        // phpProcess = processBuilder.start()
 
         // Log process output
         Thread {
@@ -59,7 +59,7 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun stopPhpServer(promise: Promise) {
         try {
-            phpProcess?.destroy()
+            //phpProcess?.destroy()
             phpProcess = null
             promise.resolve("PHP server stopped")
         } catch (e: Exception) {
