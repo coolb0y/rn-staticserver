@@ -17,31 +17,43 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun startPhpServer(promise: Promise) {
-        try {
-            val phpBinary = BinaryUtils.copyAssetBinary(context, "php/php-cgi", "php-cgi")
+    try {
+        val phpBinary = BinaryUtils.copyAssetBinary(context, "php/php-cgi", "php-cgi")
 
-            val command = listOf(
-                phpBinary.absolutePath,
-                "-b", "127.0.0.1:9000"
-            )
+        Log.d("PHP-CGI", "Binary copied to: ${phpBinary.absolutePath}")
+        Log.d("PHP-CGI", "Exists: ${phpBinary.exists()}")
+        Log.d("PHP-CGI", "Executable: ${phpBinary.canExecute()}")
 
-            val processBuilder = ProcessBuilder(command)
-                .directory(context.filesDir)
-                .redirectErrorStream(true)
+        val command = listOf(
+            phpBinary.absolutePath,
+            "-b", "127.0.0.1:9123"
+        )
 
-            phpProcess = processBuilder.start()
+        val processBuilder = ProcessBuilder(command)
+            .directory(context.filesDir)
+            .redirectErrorStream(true)
 
-            // Log process output
-            Thread {
-                phpProcess?.inputStream?.bufferedReader()?.useLines { lines ->
-                    lines.forEach { Log.d("PHP-CGI", it) }
-                }
-            }.start()
+        phpProcess = processBuilder.start()
 
-            promise.resolve("PHP server started")
-        } catch (e: Exception) {
-            promise.reject("PHP_START_FAILED", e)
-        }
+        // Log process output
+        Thread {
+            phpProcess?.inputStream?.bufferedReader()?.useLines { lines ->
+                lines.forEach { Log.d("PHP-CGI-OUT", it) }
+            }
+        }.start()
+
+        // Log errors, if any
+        Thread {
+            phpProcess?.errorStream?.bufferedReader()?.useLines { lines ->
+                lines.forEach { Log.e("PHP-CGI-ERR", it) }
+            }
+        }.start()
+
+        promise.resolve("PHP server started on port 9123")
+    } catch (e: Exception) {
+        Log.e("PHP-CGI", "Failed to start php-cgi", e)
+        promise.reject("PHP_START_FAILED", e)
+    }
     }
 
     @ReactMethod

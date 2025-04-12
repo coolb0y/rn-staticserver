@@ -210,12 +210,13 @@ export default function App() {
   const startServer = async () => {
     setLoading(true);
 
-    //  PhpServer.startPhpServer()
-    // .then((msg: string) => console.log(msg))
-    // .catch((err: any) => console.error(err));
     // Request storage permissions before accessing files
     await requestStoragePermission();
 
+    PhpServer.startPhpServer()
+    .then((msg: string) => console.log(msg))
+    .catch((err: any) => console.error(err));
+ 
     // Search for the "ChipsterContent" folder
     const chipsterContentPath = await searchChipsterContentFolder();
     if (!chipsterContentPath) {
@@ -267,7 +268,9 @@ export default function App() {
     # Fallback error page if host doesn't match known folders
     $HTTP["host"] !~ "^(${folderListString})?$" {
       server.document-root = "${errorpage}"
-    }`
+    }
+      
+    `
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
   console.log('Extra Config:', extraConfigs);
