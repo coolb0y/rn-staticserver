@@ -93,11 +93,6 @@ export default function App() {
     return true;
   };
 
-
-  const createVirtualDirectoryPath = (dir: string, subDir: string): string => {
-    return dir.replace(/ChipsterContent$/, "ChipsterEngine") + `/${subDir}`;
-  };
-
   const listFolders = async (directoryPath: string): Promise<string> => {
     try {
         const items = await RNFS.readDir(directoryPath); // Read the directory
@@ -118,7 +113,6 @@ export default function App() {
         return ""; // Return an empty string in case of an error
     }
   };
-
 
   // Function to recursively search for the "ChipsterContent" folder
   const findChipsterContentFolder = async (dir: string): Promise<string | null> => {
@@ -216,9 +210,9 @@ export default function App() {
   const startServer = async () => {
     setLoading(true);
 
-    PhpServer.startPhpServer()
-    .then((msg: string) => console.log(msg))
-    .catch((err: any) => console.error(err));
+    //  PhpServer.startPhpServer()
+    // .then((msg: string) => console.log(msg))
+    // .catch((err: any) => console.error(err));
     // Request storage permissions before accessing files
     await requestStoragePermission();
 
@@ -273,16 +267,7 @@ export default function App() {
     # Fallback error page if host doesn't match known folders
     $HTTP["host"] !~ "^(${folderListString})?$" {
       server.document-root = "${errorpage}"
-    }
-    
-    fastcgi.server = (
-      ".php" => (
-        "localhost" => (
-          "socket" => "/data/data/com.chipster/tmp/php.socket",
-          "broken-scriptfilename" => "enable"
-        )
-      )
-    )`
+    }`
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
   console.log('Extra Config:', extraConfigs);

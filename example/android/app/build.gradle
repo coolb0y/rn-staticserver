@@ -85,7 +85,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
+     packagingOptions {
+        // Preventing php-cgi from being compressed
+        exclude 'assets/php/*'
+    }
     sourceSets {
       main {
         assets.srcDirs = ['../../assets']
