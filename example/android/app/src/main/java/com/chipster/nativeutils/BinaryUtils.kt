@@ -18,6 +18,7 @@ object BinaryUtils {
                     }
                 }
                 outputFile.setExecutable(true)
+                outputFile.setWritable(false)
                 Log.d("BinaryUtils", "Binary copied and made executable.")
             } catch (e: Exception) {
                 Log.e("BinaryUtils", "Error copying binary: $assetPath", e)

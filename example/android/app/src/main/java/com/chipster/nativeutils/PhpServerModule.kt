@@ -19,14 +19,17 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
     fun startPhpServer(promise: Promise) {
     try {
         val phpBinary = BinaryUtils.copyAssetBinary(context, "php/php-cgi", "php-cgi")
+        val spawnFcgi = BinaryUtils.copyAssetBinary(context, "php/spawn-fcgi", "spawn-fcgi")
+        val socketPath = File(context.filesDir, "php-fcgi.sock-0").absolutePath
 
         Log.d("PHP-CGI", "Binary copied to: ${phpBinary.absolutePath}")
+        Log.d("PHP-CGI", "Binary copied to: ${spawnFcgi.absolutePath}")
         Log.d("PHP-CGI", "Exists: ${phpBinary.exists()}")
         Log.d("PHP-CGI", "Executable: ${phpBinary.canExecute()}")
 
         // val command = listOf(
         //     phpBinary.absolutePath,
-        //     "-b", "127.0.0.1:9123"
+        //     "-b", socketPath
         // )
 
         // val processBuilder = ProcessBuilder(command)
@@ -34,7 +37,18 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
         //     .redirectErrorStream(true)
 
         // phpProcess = processBuilder.start()
-
+        phpProcess = ProcessBuilder(
+            listOf(
+                spawnFcgi.absolutePath,
+                "-n",
+                "-p", "9569",
+                "-f", phpBinary.absolutePath,
+                "-C", "1"
+            )
+        )
+        .redirectErrorStream(true)
+        .directory(context.filesDir)
+        .start()
         // Log process output
         Thread {
             phpProcess?.inputStream?.bufferedReader()?.useLines { lines ->
@@ -49,9 +63,9 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
             }
         }.start()
 
-        promise.resolve("PHP server started on port 9123")
+        promise.resolve("PHP server started on port 9569")
     } catch (e: Exception) {
-        Log.e("PHP-CGI", "Failed to start php-cgi", e)
+        Log.e("PHP-CGI", "Failed to start php-cgi ${e}")
         promise.reject("PHP_START_FAILED", e)
     }
     }
@@ -59,7 +73,7 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun stopPhpServer(promise: Promise) {
         try {
-            //phpProcess?.destroy()
+            phpProcess?.destroy()
             phpProcess = null
             promise.resolve("PHP server stopped")
         } catch (e: Exception) {
