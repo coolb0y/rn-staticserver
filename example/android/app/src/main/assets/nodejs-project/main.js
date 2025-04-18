@@ -8,5 +8,14 @@ rn_bridge.channel.on('message', (msg) => {
   rn_bridge.channel.send(msg);
 } );
 
-// Inform react-native node is initialized.
 rn_bridge.channel.send("Node was initialized.");
+rn_bridge.channel.send(`Node was initialized a`);
+rn_bridge.channel.send(`Node was initialized b`);
+rn_bridge.channel.send(`Node was initialized c`);
+
+
+for (let i = 0; i < 5; i++) {
+  setTimeout(() => {
+    rn_bridge.channel.send(`Node was initialized ${i}`);
+  }, i * 5000); // sends every 5 seconds
+}

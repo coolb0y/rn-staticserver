@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,6 +17,7 @@ import RNFS from 'react-native-fs'; // For file system access
 import Server, { STATES } from '@dr.pogodin/react-native-static-server';
 import SendIntentAndroid from 'react-native-send-intent';
 import { requestManagePermission , checkManagePermission} from 'manage-external-storage';
+import nodejs from 'nodejs-mobile-react-native';
 
 export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -33,6 +34,30 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [searching, setSearching] = useState<boolean>(false); // State for search progress
   const serverRef = useRef<Server | null>(null);
+
+  useEffect(() => {
+    
+      console.log("Starting Node.js engine...");
+  
+      nodejs.start('main.js');
+  
+      // Add the listener
+      const listener = (msg: string) => {
+        console.log("inside nodejs listener");
+        console.log("message from nodejs",msg);
+        Alert.alert('From node', msg);
+      };
+      nodejs.channel.addListener('message', listener);
+  
+    // Cleanup if component unmounts before timeout
+       // Optional cleanup if needed
+       return () => {
+        nodejs.channel.removeListener("message", listener);
+        console.log("NodeJS listener removed on unmount");
+      };
+
+  }, []);
+  
 
   const launchBrowser = () => {
     SendIntentAndroid.openApp("net.slions.fulguris.full.fdroid",{
