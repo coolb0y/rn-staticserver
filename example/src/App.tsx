@@ -250,12 +250,27 @@ export default function App() {
     #index-file.names = ( "index.html")
     server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
 
-url.rewrite-once = ( "^/(.*\.php)$" => "/index.html?php_path=$1" )
+    url.rewrite-once = ( "^/(.*\.php)$" => "/index.html" )
 
     simple-vhost.server-root = "${chipsterContentPath}/WebContent"
     simple-vhost.default-host = "default"
 
-
+mimetype.assign = (
+  ".html" => "text/html",
+  ".htm"  => "text/html",
+  ".js"   => "application/javascript",
+  ".css"  => "text/css",
+  ".wasm" => "application/wasm",
+  ".json" => "application/json",
+  ".png"  => "image/png",
+  ".jpg"  => "image/jpeg",
+  ".jpeg" => "image/jpeg",
+  ".gif"  => "image/gif",
+  ".svg"  => "image/svg+xml",
+  ".ico"  => "image/x-icon",
+  ".mjs" => "application/javascript"
+)
+    
     # Virtual host for ChipsterWebMaker
     $HTTP["host"] == "chipsterwebmaker" {
         server.document-root = "${chipsterWebMakerPath}"
