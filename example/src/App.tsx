@@ -239,13 +239,23 @@ export default function App() {
     console.log("chipsterSupport",chipsterSupportPath);
 
     const extraConfigs = `
-    server.modules += ("mod_simple_vhost", "mod_indexfile")
-    simple-vhost.server-root = "${chipsterContentPath}/WebContent"
-    simple-vhost.default-host = "default"
+    server.modules += (
+    "mod_rewrite",        # Handles url.rewrite-once and other rewrite rules
+    "mod_indexfile",      # Serves default files like index.html
+    "mod_simple_vhost",    # Optional: for virtual hosting (remove if not needed)
+    "mod_staticfile",
+    "mod_redirect"
+    )
 
     #index-file.names = ( "index.html")
     server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
-  
+
+url.rewrite-once = ( "^/(.*\.php)$" => "/index.html?php_path=$1" )
+
+    simple-vhost.server-root = "${chipsterContentPath}/WebContent"
+    simple-vhost.default-host = "default"
+
+
     # Virtual host for ChipsterWebMaker
     $HTTP["host"] == "chipsterwebmaker" {
         server.document-root = "${chipsterWebMakerPath}"
@@ -263,6 +273,7 @@ export default function App() {
     $HTTP["host"] !~ "^(${folderListString})?$" {
     server.document-root = "${errorpage}"
     }
+    accesslog.filename = "${chipsterContentPath}/lighttpd_access.log"
   `;
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
