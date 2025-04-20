@@ -247,15 +247,20 @@ export default function App() {
     "mod_redirect"
     )
 
-    #index-file.names = ( "index.html")
-    server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
+  #index-file.names = ( "index.html")
+  server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
 
-    url.rewrite-once = ( "^/(.*\.php)$" => "/index.html" )
+  #url.rewrite-once = ( "^/(.*\.php)$" => "/index.html" )
+  url.rewrite-once = (
+  "^/(.*\.php)$" => "/index.html",
+  "^(.*)\.script$" => "$1"
+  )
 
-    simple-vhost.server-root = "${chipsterContentPath}/WebContent"
-    simple-vhost.default-host = "default"
 
-mimetype.assign = (
+  simple-vhost.server-root = "${chipsterContentPath}/WebContent"
+  simple-vhost.default-host = "default"
+
+  mimetype.assign = (
   ".html" => "text/html",
   ".htm"  => "text/html",
   ".js"   => "application/javascript",
@@ -268,8 +273,9 @@ mimetype.assign = (
   ".gif"  => "image/gif",
   ".svg"  => "image/svg+xml",
   ".ico"  => "image/x-icon",
-  ".mjs" => "application/javascript"
-)
+  ".mjs" => "application/javascript",
+  ".php" => "text/plain"
+  )
     
     # Virtual host for ChipsterWebMaker
     $HTTP["host"] == "chipsterwebmaker" {
