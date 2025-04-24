@@ -19,36 +19,25 @@ class PhpServerModule(reactContext: ReactApplicationContext) :
     fun startPhpServer(promise: Promise) {
     try {
         val phpBinary = BinaryUtils.copyAssetBinary(context, "php/php-cgi", "php-cgi")
-        val spawnFcgi = BinaryUtils.copyAssetBinary(context, "php/spawn-fcgi", "spawn-fcgi")
-        val socketPath = File(context.filesDir, "php-fcgi.sock-0").absolutePath
+        //val spawnFcgi = BinaryUtils.copyAssetBinary(context, "php/spawn-fcgi", "spawn-fcgi")
+        val socketPath = File(context.filesDir, "php-fcgi.sock").absolutePath
 
         Log.d("PHP-CGI", "Binary copied to: ${phpBinary.absolutePath}")
-        Log.d("PHP-CGI", "Binary copied to: ${spawnFcgi.absolutePath}")
+        //Log.d("PHP-CGI", "Binary copied to: ${spawnFcgi.absolutePath}")
         Log.d("PHP-CGI", "Exists: ${phpBinary.exists()}")
         Log.d("PHP-CGI", "Executable: ${phpBinary.canExecute()}")
-
-        // val command = listOf(
-        //     phpBinary.absolutePath,
-        //     "-b", socketPath
-        // )
-
-        // val processBuilder = ProcessBuilder(command)
-        //     .directory(context.filesDir)
-        //     .redirectErrorStream(true)
-
-        // phpProcess = processBuilder.start()
-        phpProcess = ProcessBuilder(
-            listOf(
-                spawnFcgi.absolutePath,
-                "-n",
-                "-p", "9569",
-                "-f", phpBinary.absolutePath,
-                "-C", "1"
-            )
+        Log.d("PHP-CGI", "file path ${socketPath}")
+        val command = listOf(
+            phpBinary.absolutePath,
+            "-b", socketPath
         )
-        .redirectErrorStream(true)
-        .directory(context.filesDir)
-        .start()
+
+        val processBuilder = ProcessBuilder(command)
+            .directory(context.filesDir)
+            .redirectErrorStream(true)
+
+        phpProcess = processBuilder.start()
+  
         // Log process output
         Thread {
             phpProcess?.inputStream?.bufferedReader()?.useLines { lines ->
