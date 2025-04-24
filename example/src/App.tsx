@@ -264,35 +264,41 @@ export default function App() {
     )
     }
 
-    # Virtual host for ChipsterWebMaker
-    $HTTP["host"] == "chipsterwebmaker" {
-        server.document-root = "${chipsterWebMakerPath}"
-    }
-
     $HTTP["host"] =~ "(.*)" {
     url.rewrite-repeat-if-not-file = (
-        "^/(?!/(UserContent|WebContent)/)(.*)$" => "/UserContent/www.%1/$2",
-        "^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2",
-        "^/UserContent/([^/]+)/(.+)$" => "/WebContent/www.$1/$2",
-        "^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2"
+        "^/(?!/(UserContent|WebContent)/)(.*)$" => "/WebContent/www.%1/$2",
+        "^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2",
+        "^/WebContent/([^/]+)/(.+)$" => "/UserContent/www.$1/$2",
+        "^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2"
     )
     }
     
     url.rewrite = (
     "^/400.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster400.php",
     "^/401.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster401.php",
-    "^/403.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster403.php",
-    "^/404.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster404.php",
+    "^/403.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster403.php"
     )
+
+    server.error-handler = "/EngineContent/ChipsterSupport/ErrorPages/Chipster500.php"
+    server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/Chipster404.php"
 
     # Virtual host for ChipsterSupport
     $HTTP["host"] == "chipstersupport" {
         server.document-root = "${chipsterSupportPath}"
     }
 
+    # Virtual host for ChipsterWebMaker
+    $HTTP["host"] == "chipsterwebmaker" {
+        server.document-root = "${chipsterWebMakerPath}"
+    }
+
     $HTTP["host"] == "chipsterwp" {
         server.document-root = "${chipsterwpPath}"
     }
+
+  accesslog.filename = "${chipsterContentPath}/access.log"
+  accesslog.format = "%{%s}t %v %h %m %U %s %b %D %{X-Rewrite-Debug}o"
+  server.errorlog = "${chipsterContentPath}/error.log"
   `;
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
