@@ -225,9 +225,6 @@ export default function App() {
       return;
     }
     
-    //const chipsterWebMakerPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterWebMaker");
-    // const chipsterSupportPath = createVirtualDirectoryPath(chipsterContentPath, "ChipsterSupport");
-    // const errorpage = createVirtualDirectoryPath(chipsterContentPath,"ChipsterSupport/ErrorPages");
     const chipsterWebMakerPath = `${chipsterContentPath}/EngineContent/ChipsterWebMaker`;
     const chipsterSupportPath = `${chipsterContentPath}/EngineContent/ChipsterSupport`;
     const chipsterwpPath = `${chipsterContentPath}/EngineContent/ChipsterWP`;
@@ -239,18 +236,55 @@ export default function App() {
     console.log("chipsterSupport",chipsterSupportPath);
 
     const extraConfigs = `
-    server.modules += ("mod_simple_vhost", "mod_indexfile")
-    simple-vhost.server-root = "${chipsterContentPath}/WebContent"
-    simple-vhost.default-host = "default"
+    server.modules = (
+    "mod_access",
+    "mod_accesslog",
+    "mod_alias",
+    "mod_magnet",
+    "mod_alias",
+    "mod_setenv",
+    "mod_rewrite",
+    "mod_redirect"
+    )
 
-    #index-file.names = ( "index.html")
+    server.username		= "http"
+    server.groupname	= "http"
+    server.document-root	= "${chipsterContentPath}"
+
+    #simple-vhost.server-root = "${chipsterContentPath}/WebContent"
+    #simple-vhost.default-host = "default"
+
     server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
-  
+    
+    # Redirect www to non-www (301 permanent)
+    $HTTP["host"] =~ "^www\.(.*)$" {  # If the request is for www...
+    setenv.add-request-header = ("X-Rewrite-Debug" => "A") 
+    url.redirect = (
+        "^/(.*)$" => "http://%1/$1"  # Redirect to non-www 
+    )
+    }
+
     # Virtual host for ChipsterWebMaker
     $HTTP["host"] == "chipsterwebmaker" {
         server.document-root = "${chipsterWebMakerPath}"
     }
-  
+
+    $HTTP["host"] =~ "(.*)" {
+    url.rewrite-repeat-if-not-file = (
+        "^/(?!/(UserContent|WebContent)/)(.*)$" => "/UserContent/www.%1/$2",
+        "^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2",
+        "^/UserContent/([^/]+)/(.+)$" => "/WebContent/www.$1/$2",
+        "^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2"
+    )
+    }
+    
+    url.rewrite = (
+    "^/400.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster400.php",
+    "^/401.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster401.php",
+    "^/403.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster403.php",
+    "^/404.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster404.php",
+    )
+
     # Virtual host for ChipsterSupport
     $HTTP["host"] == "chipstersupport" {
         server.document-root = "${chipsterSupportPath}"
@@ -258,10 +292,6 @@ export default function App() {
 
     $HTTP["host"] == "chipsterwp" {
         server.document-root = "${chipsterwpPath}"
-    }
-
-    $HTTP["host"] !~ "^(${folderListString})?$" {
-    server.document-root = "${errorpage}"
     }
   `;
   
