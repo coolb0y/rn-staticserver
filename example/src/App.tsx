@@ -242,6 +242,7 @@ export default function App() {
     "mod_staticfile",
     "mod_simple_vhost"
     )
+    
     #simple-vhost.server-root = "${chipsterContentPath}"
 
     # Set server name (optional)
