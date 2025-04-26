@@ -273,9 +273,6 @@ export default function App() {
 
   # Error handling
   server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
-
-  # Disable keep-alive for invalid requests (like CONNECT attempts)
-  server.max-keep-alive-requests = 0
   `;
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
