@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import RNFS from 'react-native-fs'; // For file system access
-import Server, { STATES } from '@dr.pogodin/react-native-static-server';
+import Server, { STATES , ERROR_LOG_FILE} from '@dr.pogodin/react-native-static-server';
 import SendIntentAndroid from 'react-native-send-intent';
 import { requestManagePermission , checkManagePermission} from 'manage-external-storage';
 
@@ -237,73 +237,51 @@ export default function App() {
 
     const extraConfigs = `
     server.modules = (
-    "mod_access",
-    "mod_accesslog",
-    "mod_alias",
-    "mod_magnet",
-    "mod_alias",
-    "mod_setenv",
     "mod_rewrite",
-    "mod_redirect"
+    "mod_redirect",
+    "mod_staticfile",
+    "mod_simple_vhost"
+    )
+    #simple-vhost.server-root = "${chipsterContentPath}"
+
+    # Set server name (optional)
+    server.tag = "rn-static-server/1.4.76"
+
+    # MIME types
+    mimetype.assign = (
+    ".html" => "text/html",
+    ".css"  => "text/css",
+    ".js"   => "application/javascript",
+    ".png"  => "image/png",
+    ".jpg"  => "image/jpeg",
+    ".gif"  => "image/gif",
+    ".svg"  => "image/svg+xml",
+    ".ico"  => "image/x-icon",
+    ".json" => "application/json",
+    ""      => "application/octet-stream"
     )
 
-    server.username		= "http"
-    server.groupname	= "http"
-    server.document-root	= "${chipsterContentPath}"
-
-    #simple-vhost.server-root = "${chipsterContentPath}/WebContent"
-    #simple-vhost.default-host = "default"
-
-    server.indexfiles = ( "index.html", "default.html", "index.htm", "default.htm", "index.php3", "index.php", "index.shtml", "index.html.var", "index.lua", "index.pl", "index.cgi" )
-    
-    # Redirect www to non-www (301 permanent)
-    $HTTP["host"] =~ "^www\.(.*)$" {  # If the request is for www...
-    setenv.add-request-header = ("X-Rewrite-Debug" => "A") 
-    url.redirect = (
-        "^/(.*)$" => "http://%1/$1"  # Redirect to non-www 
-    )
-    }
-
-    $HTTP["host"] =~ "(.*)" {
+  # Rewrite rules to map domains to folders (without endless loop)
+  $HTTP["url"] !~ "^/(WebContent|UserContent)/" {
     url.rewrite-repeat-if-not-file = (
-        "^/(?!/(UserContent|WebContent)/)(.*)$" => "/WebContent/www.%1/$2",
-        "^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2",
-        "^/WebContent/([^/]+)/(.+)$" => "/UserContent/www.$1/$2",
-        "^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2"
+        "^/(.*)$" => "/WebContent/%{req.host}/$1",
+        "^/WebContent/([^/]+)/(.*)$" => "/UserContent/$1/$2",
+        "^/UserContent/([^/]+)/(.*)$" => "/WebContent/www.$1/$2",
+        "^/WebContent/www\\.([^/]+)/(.*)$" => "/UserContent/www.$1/$2"
     )
-    }
-    
-    url.rewrite = (
-    "^/400.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster400.php",
-    "^/401.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster401.php",
-    "^/403.html$" => "/EngineContent/ChipsterSupport/ErrorPages/Chipster403.php"
-    )
+  }
 
-    server.error-handler = "/EngineContent/ChipsterSupport/ErrorPages/Chipster500.php"
-    server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/Chipster404.php"
+  # Error handling
+  server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
 
-    # Virtual host for ChipsterSupport
-    $HTTP["host"] == "chipstersupport" {
-        server.document-root = "${chipsterSupportPath}"
-    }
-
-    # Virtual host for ChipsterWebMaker
-    $HTTP["host"] == "chipsterwebmaker" {
-        server.document-root = "${chipsterWebMakerPath}"
-    }
-
-    $HTTP["host"] == "chipsterwp" {
-        server.document-root = "${chipsterwpPath}"
-    }
-
-  accesslog.filename = "${chipsterContentPath}/access.log"
-  accesslog.format = "%{%s}t %v %h %m %U %s %b %D %{X-Rewrite-Debug}o"
-  server.errorlog = "${chipsterContentPath}/error.log"
+  # Disable keep-alive for invalid requests (like CONNECT attempts)
+  server.max-keep-alive-requests = 0
   `;
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
   console.log('Extra Config:', extraConfigs);
-  
+  console.log("Error log file at:", ERROR_LOG_FILE);
+
     try {
       serverRef.current = new Server({
         extraConfig: extraConfigs,
@@ -311,6 +289,15 @@ export default function App() {
         hostname: '127.0.0.1',
         port: 20286,
         stopInBackground: false,
+        errorLog: {
+          conditionHandling: true,
+          fileNotFound: true,
+          requestHandling: true,
+          requestHeader: true,
+          requestHeaderOnError: true,
+          responseHeader: true,
+          timeouts: true,
+        }
       });
 
       serverRef.current.addStateListener((newState, details, error) => {
