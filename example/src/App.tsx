@@ -261,14 +261,14 @@ export default function App() {
     )
 
 
-    $HTTP["host"] =~ "(.*)" {
-      url.rewrite-repeat-if-not-file = (
-      "^/(?!(UserContent|WebContent)/)(.*)$" => "/UserContent/www.%1/$2",
-      "^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2",
-      "^/UserContent/([^/]+)/(.+)$" => "/WebContent/www.$1/$2",
-      "^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2"
-      )
-      }
+$HTTP["host"] =~ "(.*)" {
+url.rewrite-repeat-if-not-file = (
+"^/(?!(WebContent|UserContent)/)(.*)$" => "/WebContent/www.%1/$2",
+"^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2",
+"^/WebContent/([^/]+)/(.+)$" => "/UserContent/www.$1/$2",
+"^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2"
+)
+}
 
   # Error handling
   server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
