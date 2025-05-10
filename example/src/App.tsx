@@ -245,12 +245,10 @@ export default function App() {
     
     #simple-vhost.server-root = "${chipsterContentPath}"
 
-    # Set server name (optional)
-    server.tag = "rn-static-server/1.4.76"
-
     # MIME types
     mimetype.assign = (
     ".html" => "text/html",
+    ".htm" => "text/html",
     ".css"  => "text/css",
     ".js"   => "application/javascript",
     ".png"  => "image/png",
@@ -262,15 +260,15 @@ export default function App() {
     ""      => "application/octet-stream"
     )
 
-  # Rewrite rules to map domains to folders (without endless loop)
-  $HTTP["url"] !~ "^/(WebContent|UserContent)/" {
-    url.rewrite-repeat-if-not-file = (
-        "^/(.*)$" => "/WebContent/%{req.host}/$1",
-        "^/WebContent/([^/]+)/(.*)$" => "/UserContent/$1/$2",
-        "^/UserContent/([^/]+)/(.*)$" => "/WebContent/www.$1/$2",
-        "^/WebContent/www\\.([^/]+)/(.*)$" => "/UserContent/www.$1/$2"
-    )
-  }
+
+    $HTTP["host"] =~ "(.*)" {
+      url.rewrite-repeat-if-not-file = (
+      "^/(?!(UserContent|WebContent)/)(.*)$" => "/UserContent/www.%1/$2",
+      "^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2",
+      "^/UserContent/([^/]+)/(.+)$" => "/WebContent/www.$1/$2",
+      "^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2"
+      )
+      }
 
   # Error handling
   server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
