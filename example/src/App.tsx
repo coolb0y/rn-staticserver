@@ -240,7 +240,8 @@ export default function App() {
     "mod_rewrite",
     "mod_redirect",
     "mod_staticfile",
-    "mod_simple_vhost"
+    "mod_simple_vhost",
+    "mod_magnet"
     )
     
     #simple-vhost.server-root = "${chipsterContentPath}"

@@ -125,10 +125,34 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
   )
 endif()
 
+if(CMAKE_SYSTEM_NAME MATCHES "Android")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} ${CMAKE_CURRENT_SOURCE_DIR}/lua
+      -B ${CMAKE_BINARY_DIR}/lua
+      -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/sysroot
+      -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+      ${EXTRA_BUILD_ARGS}
+    COMMAND_ECHO STDOUT
+    COMMAND_ERROR_IS_FATAL ANY
+  )
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/lua
+      --config Release ${EXTRA_INSTALL_ARGS}
+  )
+  execute_process(COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR}/lua)
+
+  file(
+    COPY ${CMAKE_BINARY_DIR}/sysroot/lib/liblua.so
+    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/android/src/main/jniLibs/${ANDROID_ABI}
+  )
+endif()
+
+
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
-
+set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
 # Above we have build & installed a local version of PCRE2 library, now we want
 # to enforce Lighttpd build to see and use it (rather than any system-wide
 # installation of another PCRE2 version). On Ubuntu / macOS it can be done
@@ -159,8 +183,9 @@ set(PLUGIN_STATIC
   PLUGIN_INIT(mod_setenv)\n
   PLUGIN_INIT(mod_simple_vhost)\n
   PLUGIN_INIT(mod_staticfile)\n
+  PLUGIN_INIT(mod_magnet)\n
 )
-
+add_subdirectory(lua)  # or wherever your Lua source is
 if(WITH_MOD_WEBDAV)
   set(PLUGIN_STATIC "${PLUGIN_STATIC}PLUGIN_INIT(mod_webdav)\n")
 endif()
