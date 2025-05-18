@@ -10,7 +10,7 @@ endif()
 # This prevents CMake from complaining that INSTALL(..) directives in
 # Lighttpd CMakeLists.txt miss BUNDLE DESTINATION.
 set(CMAKE_MACOSX_BUNDLE OFF)
-
+include_directories(${CMAKE_SOURCE_DIR}/lua)
 # Pre-build of PCRE2 for the target system from sources.
 
 if(CMAKE_CROSSCOMPILING AND CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
@@ -152,7 +152,6 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Android|Windows")
   set(BUILD_SHARED_LIBS 1)
 endif()
-set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
 # Above we have build & installed a local version of PCRE2 library, now we want
 # to enforce Lighttpd build to see and use it (rather than any system-wide
 # installation of another PCRE2 version). On Ubuntu / macOS it can be done
@@ -166,7 +165,10 @@ else()
   set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
 endif()
 
+set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/sysroot")
+add_subdirectory(lua)
 add_subdirectory(lighttpd1.4)
+
 
 set(PLUGIN_STATIC
   PLUGIN_INIT(mod_access)\n
@@ -185,7 +187,7 @@ set(PLUGIN_STATIC
   PLUGIN_INIT(mod_staticfile)\n
   PLUGIN_INIT(mod_magnet)\n
 )
-add_subdirectory(lua)  # or wherever your Lua source is
+  # or wherever your Lua source is
 if(WITH_MOD_WEBDAV)
   set(PLUGIN_STATIC "${PLUGIN_STATIC}PLUGIN_INIT(mod_webdav)\n")
 endif()

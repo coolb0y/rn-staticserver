@@ -3,4 +3,7 @@
 	url = https://github.com/PCRE2Project/pcre2.git
 [submodule "lighttpd1.4"]
 	path = lighttpd1.4
-	url = https://github.com/birdofpreyru/lighttpd1.4
+	url = git@github.com:coolb0y/lighttpd1.4.git
+[submodule "lua"]
+	path = lua
+	url = git@github.com:coolb0y/lua.git
