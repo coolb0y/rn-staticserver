@@ -230,52 +230,45 @@ export default function App() {
     const chipsterwpPath = `${chipsterContentPath}/EngineContent/ChipsterWP`;
     const errorpage = `${chipsterContentPath}/EngineContent/ChipsterSupport/ErrorPages`; 
     let folderListString = await listFolders(`${chipsterContentPath}/WebContent`);
+    const luaPath = `${chipsterContentPath}/EngineContent/ChipsterSupport/lua-config/rewriter.lua`;
 
     console.log("errorpage",errorpage);
     console.log("chipsterwpPath",chipsterwpPath);
     console.log("chipsterSupport",chipsterSupportPath);
-
+    
     const extraConfigs = `
     server.modules = (
-    "mod_rewrite",
-    "mod_redirect",
-    "mod_staticfile",
-    "mod_simple_vhost",
-    "mod_magnet"
-    )
-    
-    #simple-vhost.server-root = "${chipsterContentPath}"
+  "mod_rewrite",
+  "mod_redirect",
+  "mod_staticfile",
+  "mod_simple_vhost",
+  "mod_magnet"
+  )
 
-    # MIME types
-    mimetype.assign = (
-    ".html" => "text/html",
-    ".htm" => "text/html",
-    ".css"  => "text/css",
-    ".js"   => "application/javascript",
-    ".png"  => "image/png",
-    ".jpg"  => "image/jpeg",
-    ".gif"  => "image/gif",
-    ".svg"  => "image/svg+xml",
-    ".ico"  => "image/x-icon",
-    ".json" => "application/json",
-    ""      => "application/octet-stream"
-    )
+  mimetype.assign = (
+  ".html" => "text/html",
+  ".htm" => "text/html",
+  ".css"  => "text/css",
+  ".js"   => "application/javascript",
+  ".png"  => "image/png",
+  ".jpg"  => "image/jpeg",
+  ".gif"  => "image/gif",
+  ".svg"  => "image/svg+xml",
+  ".ico"  => "image/x-icon",
+  ".json" => "application/json",
+  ""      => "application/octet-stream"
+  )
 
+  $HTTP["host"] =~ ".*" {
+  magnet.attract-raw-to = ( "${luaPath}" )
+  }
 
-$HTTP["host"] =~ "(.*)" {
-url.rewrite-repeat-if-not-file = (
-"^/(?!(WebContent|UserContent)/)(.*)$" => "/WebContent/www.%1/$2",
-"^/WebContent/www.([^/]+)/(.+)$" => "/WebContent/$1/$2",
-"^/WebContent/([^/]+)/(.+)$" => "/UserContent/www.$1/$2",
-"^/UserContent/www.([^/]+)/(.+)$" => "/UserContent/$1/$2"
-)
-}
-
-  # Error handling
   server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
   `;
+
   
   console.log('ChipsterContent folder found at:', chipsterContentPath);
+  console.log('lua path:',luaPath);
   console.log('Extra Config:', extraConfigs);
   console.log("Error log file at:", ERROR_LOG_FILE);
 
