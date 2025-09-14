@@ -237,17 +237,17 @@ export default function App() {
     console.log("chipsterSupport",chipsterSupportPath);
     
     const extraConfigs = `
-    server.modules = (
+server.modules = (
   "mod_rewrite",
   "mod_redirect",
   "mod_staticfile",
   "mod_simple_vhost",
   "mod_magnet"
-  )
+)
 
-  mimetype.assign = (
+mimetype.assign = (
   ".html" => "text/html",
-  ".htm" => "text/html",
+  ".htm"  => "text/html",
   ".css"  => "text/css",
   ".js"   => "application/javascript",
   ".png"  => "image/png",
@@ -257,13 +257,14 @@ export default function App() {
   ".ico"  => "image/x-icon",
   ".json" => "application/json",
   ""      => "application/octet-stream"
-  )
+)
 
-  $HTTP["host"] =~ ".*" {
-  magnet.attract-raw-to = ( "${luaPath}" )
-  }
+$HTTP["host"] =~ ".*" {
+  magnet.attract-physical-path-to = ( "${luaPath}" )
+}
 
-  server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
+server.error-handler-404 = "/EngineContent/ChipsterSupport/ErrorPages/index.html"
+
   `;
 
   
