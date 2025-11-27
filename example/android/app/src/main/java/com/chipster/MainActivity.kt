@@ -12,7 +12,12 @@ class MainActivity : ReactActivity() {
    * rendering of the component.
    */
   override fun getMainComponentName(): String = "Chipster"
-
+    companion object {
+        init {
+            System.loadLibrary("lua") // no "lib" prefix or ".so"
+            System.loadLibrary("lsqlite3") // no "lib" prefix or ".so"
+        }
+    }
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]

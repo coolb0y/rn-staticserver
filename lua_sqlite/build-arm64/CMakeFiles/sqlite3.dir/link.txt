@@ -1,0 +1,2 @@
+/home/cyberboy/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar qc libsqlite3.a CMakeFiles/sqlite3.dir/sqlite3.c.o
+/home/cyberboy/Android/Sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib libsqlite3.a
