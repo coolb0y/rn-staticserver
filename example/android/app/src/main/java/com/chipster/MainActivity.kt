@@ -15,7 +15,6 @@ class MainActivity : ReactActivity() {
     companion object {
         init {
             System.loadLibrary("lua") // no "lib" prefix or ".so"
-            System.loadLibrary("lsqlite3") // no "lib" prefix or ".so"
         }
     }
   /**
